@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.NumberConversions;
 
@@ -28,6 +29,10 @@ public class GetBack extends JavaPlugin implements Listener, CommandExecutor {
     public void onEnable() {
         super.onEnable();
         getServer().getPluginManager().registerEvents(this, this);
+        if (!config.contains("welcome")) {
+            config.set("welcome", "当前开启了 /back 命令，可以回到上次死亡地点，同时服务器难度已调整至困难；可以前往 http://map.vjoi.cn/ 查看地图");
+            saveConfig();
+        }
         if (!config.contains("deaths")) {
             config.set("deaths", new ArrayList<>());
             saveConfig();
@@ -115,6 +120,12 @@ public class GetBack extends JavaPlugin implements Listener, CommandExecutor {
         virtually impossible since its value being present
         is checked when loading config in onEnable
          */
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event){
+        Player player = event.getPlayer();
+        player.sendMessage(ChatColor.GREEN + getConfig().getString("welcome")+ChatColor.RESET);
     }
 
     @Override
