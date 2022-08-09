@@ -8,10 +8,5 @@ website: https://github.com/a13ssandr0/GetBack
 load: POSTWORLD
 commands:
   back:
-    description: Go back to where you died
-    usage: /back [<Player>]
-  home:
-    description: Go back to the last bed where you slept
-    usage: /home [<Player>]
-    aliases:
-      - backhome
+    description: 回到案发现场
+    usage: /back
