@@ -28,14 +28,6 @@ public class GetBack extends JavaPlugin implements Listener, CommandExecutor {
     public void onEnable() {
         super.onEnable();
         getServer().getPluginManager().registerEvents(this, this);
-        if (!config.contains("deathmessage")) {
-            config.set("deathmessage", "You died. Pathetic... Use /back to teleport back to your death location.");
-            saveConfig();
-        }
-        if (!config.contains("errormessage")) {
-            config.set("errormessage", "You're not dead, please DIE!!");
-            saveConfig();
-        }
         if (!config.contains("deaths")) {
             config.set("deaths", new ArrayList<>());
             saveConfig();
@@ -117,7 +109,7 @@ public class GetBack extends JavaPlugin implements Listener, CommandExecutor {
          */
         config.set("deaths", packMap(deaths));
         saveConfig(); // saving config here just in case the plugin would crash before onDisable is called
-        event.getEntity().sendMessage("" /*removes NPE warning*/ + config.getString("deathmessage"));
+        event.getEntity().sendMessage("" /*removes NPE warning*/ + "恭喜你死掉了捏，可以使用 /back 指令回到案发现场");
         /*
         IDE warns about config.getString() returning null,
         virtually impossible since its value being present
@@ -129,40 +121,18 @@ public class GetBack extends JavaPlugin implements Listener, CommandExecutor {
     public boolean onCommand(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if (command == getCommand("back")){
             Player dstPlayer;
-            if (args.length>0) dstPlayer = getServer().getPlayer(args[0]);
-            else if (sender instanceof Player) dstPlayer = (Player) sender;
+            if (sender instanceof Player) dstPlayer = (Player) sender;
             else {
-                sender.sendMessage(ChatColor.RED + "Wrong command. Usage:" + ChatColor.RESET);
+                sender.sendMessage(ChatColor.RED + "指令错误. 使用说明:" + ChatColor.RESET);
                 return false;
             }
-            if (dstPlayer == null)
-                sender.sendMessage(ChatColor.RED + "Player not found" + ChatColor.RESET);
-            else if (!deaths.containsKey(dstPlayer.getName()))
-                sender.sendMessage(ChatColor.RED + getConfig().getString("errormessage") + ChatColor.RESET);
+            if (!deaths.containsKey(dstPlayer.getName()))
+                sender.sendMessage(ChatColor.RED + "找不到死亡记录捏" + ChatColor.RESET);
             else {
-                String tp_msg = ChatColor.GREEN + "Teleporting " + ChatColor.BLUE + ChatColor.BOLD + dstPlayer.getName() + ChatColor.RESET + ChatColor.GREEN + " back" + ChatColor.RESET;
+                String tp_msg = ChatColor.GREEN + "正在将 " + ChatColor.BLUE + ChatColor.BOLD + dstPlayer.getName() + ChatColor.RESET + ChatColor.GREEN + " 传送回案发现场" + ChatColor.RESET;
                 sender.sendMessage(tp_msg);
                 if (sender!=dstPlayer) dstPlayer.sendMessage(tp_msg);
                 dstPlayer.teleport(deaths.get(dstPlayer.getName()));
-            }
-            return true;
-        } else if (command == getCommand("home")){
-            Player dstPlayer;
-            if (args.length>0) dstPlayer = getServer().getPlayer(args[0]);
-            else if (sender instanceof Player) dstPlayer = (Player) sender;
-            else {
-                sender.sendMessage(ChatColor.RED + "Wrong command. Usage:" + ChatColor.RESET);
-                return false;
-            }
-            if (dstPlayer == null)
-                sender.sendMessage(ChatColor.RED + "Player not found" + ChatColor.RESET);
-            else if (dstPlayer.getBedSpawnLocation() == null)
-                sender.sendMessage(ChatColor.RED + "No bed found for " + dstPlayer.getName() + ChatColor.RESET);
-            else {
-                String tp_msg = ChatColor.GREEN + "Teleporting " + ChatColor.BLUE + ChatColor.BOLD + dstPlayer.getName() + ChatColor.RESET + ChatColor.GREEN + " home" + ChatColor.RESET;
-                sender.sendMessage(tp_msg);
-                if (sender!=dstPlayer) dstPlayer.sendMessage(tp_msg);
-                dstPlayer.teleport(dstPlayer.getBedSpawnLocation());
             }
             return true;
         }
